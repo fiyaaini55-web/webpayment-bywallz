@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>VoidPay | Bayar Gelap Elegan</title>
+    <!-- Font Awesome 6 (gratis, ikon keren) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Font: inter modern & syne untuk sentuhan mewah -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&family=Syne:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, #0a0c12, #030507);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        /* efek grid halus & noise */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* glassmorphism card utama */
+        .payment-card {
+            background: rgba(12, 14, 22, 0.75);
+            backdrop-filter: blur(14px);
+            border-radius: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(255, 255, 255, 0.05) inset;
+            width: 100%;
+            max-width: 520px;
+            padding: 2rem 2rem 2.2rem;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        /* header dengan sentuhan aksen neon */
+        .brand {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand-icon {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #ffffff 20%, #aaaaaa 90%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .brand h1 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 2.1rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(120deg, #F0F0F0, #FFFFFF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .brand .tagline {
+            color: #b9c7d9;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 6px;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        /* ringkasan pembayaran */
+        .amount-section {
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 2rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .label-total {
+            font-weight: 500;
+            color: #cdd9f4;
+            font-size: 0.9rem;
+            letter-spacing: 0.3px;
+        }
+
+        .total-price {
+            font-family: 'Syne', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .total-price small {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* pilihan metode */
+        .method-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            color: #eef3ff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-left: 3px solid #ffffff70;
+            padding-left: 12px;
+        }
+
+        .method-grid {
+            display: flex;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .method-option {
+            flex: 1;
+            background: rgba(20, 24, 34, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.6rem;
+            padding: 1rem 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            backdrop-filter: blur(4px);
+        }
+
+        .method-option i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 8px;
+            color: #ffffffcc;
+            transition: 0.2s;
+        }
+
+        .method-option span {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #eef2ff;
+            letter-spacing: 0.3px;
+        }
+
+        .method-option.active {
+            background: linear-gradient(145deg, #ffffff10, #202632);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255,255,240,0.2) inset;
+        }
+
+        .method-option.active i {
+            color: white;
+            text-shadow: 0 0 5px rgba(255,255,200,0.6);
+        }
+
+        /* detail nomor & QR style */
+        .payment-detail {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 1.8rem;
+            padding: 1.4rem 1.5rem;
+            margin: 1.8rem 0 1.6rem;
+            border: 1px solid rgba(255,255,240,0.1);
+            transition: all 0.2s;
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+            font-weight: 600;
+            color: #d9e2ff;
+            border-bottom: 1px dashed rgba(255,255,255,0.2);
+            padding-bottom: 10px;
+        }
+
+        .detail-header i {
+            font-size: 1.4rem;
+            color: white;
+        }
+
+        .nomor-container {
+            background: #05070c;
+            border-radius: 1.5rem;
+            padding: 0.9rem 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 1px solid #2c2f3a;
+        }
+
+        .nomor {
+            font-family: 'Inter', monospace;
+            font-weight: 700;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            color: #f5f9ff;
+            background: rgba(255,255,255,0.02);
+            padding: 0.2rem 0;
+        }
+
+        .copy-btn {
+            background: rgba(255,255,255,0.08);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(4px);
+        }
+
+        .copy-btn i {
+            font-size: 0.9rem;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(0.96);
+        }
+
+        /* qr style (sebagai alternatif visual modern) */
+        .qr-mock {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            background: #0a0e15;
+            border-radius: 1.5rem;
+            padding: 0.8rem;
+            border: 1px dashed rgba(255,255,200,0.2);
+        }
+
+        .qr-icon {
+            font-size: 2.2rem;
+            color: #eef5ff;
+        }
+
+        .qr-text {
+            font-size: 0.7rem;
+            color: #aeb9cf;
+            font-weight: 400;
+        }
+
+        .status-note {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 1rem;
+            color: #8a99b3;
+        }
+
+        /* tombol bayar */
+        .pay-button {
+            width: 100%;
+            background: linear-gradient(105deg, #FFFFFF, #E0E5F0);
+            border: none;
+            padding: 1rem;
+            border-radius: 2.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            font-family: 'Syne', sans-serif;
+            letter-spacing: 1px;
+            color: #03070f;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+        }
+
+        .pay-button i {
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        .pay-button:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+        }
+
+        .pay-button:active {
+            transform: translateY(2px);
+        }
+
+        /* toast custom */
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: #1e1f2c;
+            backdrop-filter: blur(20px);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 12px 28px black;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none;
+            font-family: monospace;
+        }
+
+        .toast-message.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 1.6rem;
+            font-size: 0.65rem;
+            color: #5f6f8a;
+        }
+
+        @media (max-width: 480px) {
+            .payment-card {
+                padding: 1.5rem;
+            }
+            .nomor {
+                font-size: 1rem;
+            }
+            .total-price {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="payment-card">
+    <div class="brand">
+        <div class="brand-icon">
+            <i class="fas fa-moon-stars"></i>
+        </div>
+        <h1>VoidPay</h1>
+        <div class="tagline">• gelap · premium · cepat •</div>
+    </div>
+
+    <!-- nominal fleksibel (user bisa ubah via input sederhana atau statis, tapi kita kasih pilihan minimalis) -->
+    <div class="amount-section">
+        <span class="label-total"><i class="fas fa-tag"></i> TOTAL BAYAR</span>
+        <div class="total-price">
+            <span id="amountValue">150.000</span> <small>IDR</small>
+        </div>
+    </div>
+
+    <!-- pilih metode: DANA atau GOPAY -->
+    <div class="method-label">
+        <i class="fas fa-bolt"></i> Pilih Gerbang Bayar
+    </div>
+    <div class="method-grid">
+        <div class="method-option" data-method="dana" id="methodDana">
+            <i class="fab fa-android"></i> <!-- ikon representasi DANA bisa pakai fa-wallet tapi biar khas -->
+            <span>DANA</span>
+        </div>
+        <div class="method-option" data-method="gopay" id="methodGopay">
+            <i class="fab fa-google-pay"></i>
+            <span>GoPay</span>
+        </div>
+    </div>
+
+    <!-- area dinamis yang menampilkan nomor tujuan + virtual qr style -->
+    <div class="payment-detail" id="paymentDetailArea">
+        <div class="detail-header">
+            <i class="fas fa-qrcode" id="detailIcon"></i>
+            <span id="detailTitle">Nomor DANA</span>
+        </div>
+        <div class="nomor-container">
+            <div class="nomor" id="nomorTujuan">081274339028</div>
+            <button class="copy-btn" id="copyNumberBtn"><i class="fas fa-copy"></i> Salin</button>
+        </div>
+        <!-- mock qr sebagai aksen kece -->
+        <div class="qr-mock">
+            <div class="qr-icon"><i class="fas fa-circle-dollar-to-slot"></i></div>
+            <div class="qr-text">scan cepat • bayar aman <i class="fas fa-shield-alt"></i></div>
+        </div>
+        <div class="status-note" id="statusNote">
+            <i class="fas fa-clock"></i> Klik salin nomor atau transfer ke nomor di atas
+        </div>
+    </div>
+
+    <!-- tombol bayar utama (simulasi notifikasi) -->
+    <button class="pay-button" id="payNowBtn">
+        <i class="fas fa-arrow-right-to-bracket"></i> Konfirmasi & Bayar
+    </button>
+    <footer>
+        ⚡ transaksi 100% terenkripsi · midnight secure
+    </footer>
+</div>
+
+<div id="toastMsg" class="toast-message">✨ Tersalin ke clipboard</div>
+
+<script>
+    // Data nomor statis dari permintaan
+    const DANA_NUMBER = "081274339028";
+    const GOPAY_NUMBER = "081274339028";
+
+    // State metode aktif (default dana)
+    let currentMethod = "dana";
+
+    // Elemen DOM
+    const methodDana = document.getElementById("methodDana");
+    const methodGopay = document.getElementById("methodGopay");
+    const nomorTujuanEl = document.getElementById("nomorTujuan");
+    const detailTitleEl = document.getElementById("detailTitle");
+    const detailIcon = document.getElementById("detailIcon");
+    const payBtn = document.getElementById("payNowBtn");
+    const copyBtn = document.getElementById("copyNumberBtn");
+    const amountSpan = document.getElementById("amountValue");
+
+    // Fungsi ubah UI berdasarkan metode
+    function updatePaymentMethod(method) {
+        // hapus active dari kedua
+        methodDana.classList.remove("active");
+        methodGopay.classList.remove("active");
+        
+        if (method === "dana") {
+            methodDana.classList.add("active");
+            nomorTujuanEl.innerText = DANA_NUMBER;
+            detailTitleEl.innerText = "Nomor DANA";
+            detailIcon.className = "fas fa-wallet";
+            currentMethod = "dana";
+        } else {
+            methodGopay.classList.add("active");
+            nomorTujuanEl.innerText = GOPAY_NUMBER;
+            detailTitleEl.innerText = "Nomor GoPay";
+            detailIcon.className = "fab fa-google-pay";
+            currentMethod = "gopay";
+        }
+        
+        // animasi kecil di payment-detail (opsional)
+        const paymentDiv = document.getElementById("paymentDetailArea");
+        paymentDiv.style.transform = "scale(0.99)";
+        setTimeout(() => { paymentDiv.style.transform = "scale(1)"; }, 120);
+    }
+
+    // Event listeners method
+    methodDana.addEventListener("click", () => {
+        updatePaymentMethod("dana");
+    });
+    methodGopay.addEventListener("click", () => {
+        updatePaymentMethod("gopay");
+    });
+
+    // Fungsi copy nomor
+    async function copyNomor() {
+        const nomorText = nomorTujuanEl.innerText;
+        try {
+            await navigator.clipboard.writeText(nomorText);
+            showToast(`📋 Nomor ${currentMethod === "dana" ? "DANA" : "GoPay"} tersalin!`, "#b9ffb9");
+        } catch (err) {
+            // fallback
+            const textarea = document.createElement("textarea");
+            textarea.value = nomorText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            showToast(`📋 Tersalin: ${nomorText}`, "#ddd");
+        }
+    }
+
+    copyBtn.addEventListener("click", copyNomor);
+
+    // Toast notification
+    let toastTimeout;
+    function showToast(message, colorHint = null) {
+        const toast = document.getElementById("toastMsg");
+        toast.innerText = message;
+        if (colorHint) {
+            toast.style.background = "#181f2b";
+            toast.style.borderLeft = `3px solid ${colorHint === "#b9ffb9" ? "#a3ffa3" : "#ffffff"}`;
+        } else {
+            toast.style.background = "#1e1f2c";
+        }
+        toast.classList.add("show");
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            toast.classList.remove("show");
+        }, 2500);
+    }
+
+    // Saat klik bayar (konfirmasi elegan)
+    payBtn.addEventListener("click", () => {
+        const metode = currentMethod === "dana" ? "DANA" : "GoPay";
+        const nomor = nomorTujuanEl.innerText;
+        const nominal = amountSpan.innerText;
+        
+        // Simulasi proses pembayaran mewah
+        payBtn.innerHTML = `<i class="fas fa-spinner fa-pulse"></i> Memproses...`;
+        payBtn.disabled = true;
+        
+        setTimeout(() => {
+            // reset tombol
+            payBtn.innerHTML = `<i class="fas fa-check-circle"></i> Berhasil!`;
+            payBtn.style.background = "linear-gradient(105deg, #C6FFDD, #f5ffd0)";
+            
+            // tampilkan notifikasi detail
+            showToast(`✅ ${metode} · Rp ${nominal} ke ${nomor} siap diproses.`, "#a0ffc0");
+            
+            // reset tombol setelah jeda (agar tidak stuck)
+            setTimeout(() => {
+                payBtn.innerHTML = `<i class="fas fa-arrow-right-to-bracket"></i> Konfirmasi & Bayar`;
+                payBtn.disabled = false;
+                payBtn.style.background = "linear-gradient(105deg, #FFFFFF, #E0E5F0)";
+            }, 2000);
+        }, 1300);
+    });
+
+    // Optional: tambahkan efek ubah nominal? biar lebih interaktif (mengikuti premium modern)
+    // Di area total, pengguna bisa mengklik untuk mengedit? buat sentuhan lebih dinamis namun tetap rapi.
+    // kita buat small edit mode (double click atau optional)
+    const totalArea = document.querySelector(".amount-section");
+    let isEditing = false;
+    totalArea.addEventListener("dblclick", (e) => {
+        if (isEditing) return;
+        const currentVal = amountSpan.innerText.replace(/\./g, "");
+        const inputTemp = document.createElement("input");
+        inputTemp.type = "text";
+        inputTemp.value = currentVal;
+        inputTemp.style.background = "#0f121c";
+        inputTemp.style.color = "white";
+        inputTemp.style.border = "1px solid white";
+        inputTemp.style.borderRadius = "2rem";
+        inputTemp.style.padding = "0.3rem 1rem";
+        inputTemp.style.fontWeight = "bold";
+        inputTemp.style.fontSize = "1.5rem";
+        inputTemp.style.width = "140px";
+        inputTemp.style.textAlign = "center";
+        inputTemp.style.fontFamily = "monospace";
+        
+        const parent = amountSpan.parentNode;
+        const oldSpan = amountSpan;
+        parent.replaceChild(inputTemp, oldSpan);
+        inputTemp.focus();
+        
+        function finishEdit() {
+            let newVal = inputTemp.value.replace(/[^0-9]/g, "");
+            if (newVal === "" || parseInt(newVal) <= 0) newVal = "50000";
+            let formatted = parseInt(newVal).toLocaleString("id-ID");
+            const newSpan = document.createElement("span");
+            newSpan.id = "amountValue";
+            newSpan.innerText = formatted;
+            parent.replaceChild(newSpan, inputTemp);
+            window.amountSpan = document.getElementById("amountValue");
+            isEditing = false;
+            showToast(`💰 Nominal diperbarui: Rp ${formatted}`, "#cbd5ff");
+        }
+        
+        inputTemp.addEventListener("blur", finishEdit);
+        inputTemp.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                finishEdit();
+            }
+        });
+        isEditing = true;
+    });
+    
+    // Update referensi global amountSpan setelah edit dinamis
+    // overide function assign ulang
+    const 
